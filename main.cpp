@@ -21,6 +21,5 @@ int main()
         blockBuilder.insertCommand( line );
     }
 
-    cout << "Hello World!" << endl;
     return 0;
 }

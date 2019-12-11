@@ -4,3 +4,9 @@ CMakeScripts
 Makefile
 cmake_install.cmake
 install_manifest.txt
+
+*.user
+
+*.autosave
+
+CMakeLists.txt.user.ce230cd.22

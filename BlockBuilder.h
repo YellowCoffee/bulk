@@ -10,6 +10,7 @@ class BlockBuilder
 {
 public:
     BlockBuilder();
+    BlockBuilder(int blockSize);
 
     void insertCommand(const Command& command);
     Block getBlock();
@@ -19,12 +20,12 @@ private:
     std::vector<Command> m_commands;
     std::vector<BlockWriter*> m_blockWriters;
     Terminator *m_terminator;
-
 };
 
 class Terminator {
 public:
-    Terminator (BlockBuilder* builder);
+    Terminator (BlockBuilder* builder)
+        : m_builder(builder) {}
     virtual bool checkFinish(const Command& command) = 0;
 
 protected:
@@ -33,12 +34,15 @@ protected:
 
 class RegularTerminator : public Terminator {
 public:
+    RegularTerminator(BlockBuilder* builder)
+        : Terminator(builder) {}
+
     bool checkFinish(const Command &command) override {
-        ++commandCount;
-        if (commandCount == commandSize) {
+        if (++commandCount == commandSize) {
             commandCount = 0;
             return true;
         }
+//        ++commandCount;
         return false;
     }
 
@@ -46,19 +50,22 @@ public:
         commandSize = value;
     }
 private:
-    static int commandSize = 3;
+    static int commandSize;
     int commandCount = 0;
 };
 
 class DynamicTerminator : public Terminator {
 public:
+    DynamicTerminator(BlockBuilder* builder)
+        : Terminator(builder) {}
+
     bool checkFinish(const Command &command) override {
-        if ( command.compare("{") ) {
+        if ( command.line().compare("{") ) {
             ++m_counter;
             return false;
-        } else if (command.compare("}")) {
-            --counter;
-            if ( !counter )
+        } else if (command.line().compare("}")) {
+            --m_counter;
+            if ( m_counter == 0 )
                 return true;
         }
     }
@@ -67,3 +74,4 @@ private:
 };
 
 #endif // BLOCKBUILDER_H
+

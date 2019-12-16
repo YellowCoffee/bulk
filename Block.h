@@ -4,13 +4,16 @@
 #include <vector>
 #include <string>
 
-typedef std::string Command;
+#include "Command.h"
 
 class Block
 {
 public:
     Block( const std::vector<Command>& commandVector );
-    std::vector<Command> commandVector() const;
+    std::vector<Command>::const_iterator begin() const;
+    std::vector<Command>::const_iterator end() const;
+
+    time_t timeStamp() const;
 
 private:
     std::vector<Command> m_commandVector;

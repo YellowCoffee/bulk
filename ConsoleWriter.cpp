@@ -1,6 +1,9 @@
 #include "ConsoleWriter.h"
 
 #include <iostream>
+#include <iterator>
+
+using namespace std;
 
 ConsoleWriter::ConsoleWriter()
     : BlockWriter()
@@ -10,9 +13,11 @@ ConsoleWriter::ConsoleWriter()
 
 void ConsoleWriter::write(const Block &block)
 {
-    std::cout << "bulk: ";
-    for( const auto& command : block.commandVector() ) {
-        std::cout << command << ", ";
+    cout << "bulk: ";
+    auto it = block.begin();
+    cout << *it++;
+    while (it != block.end()) {
+        cout << ", " << *it++;
     }
-    std::cout << std::endl;
+    cout << endl;
 }

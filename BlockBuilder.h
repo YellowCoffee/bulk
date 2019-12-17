@@ -5,6 +5,8 @@
 #include "BlockWriter.h"
 
 class Terminator;
+class DynamicTerminator;
+class RegularTerminator;
 
 class BlockBuilder
 {
@@ -15,6 +17,8 @@ public:
     void insertCommand(const Command& command);
     Block getBlock();
     void subscribe(BlockWriter* blockWriter);
+
+    void setTerminator(Terminator *terminator);
 
 private:
     std::vector<Command> m_commands;
@@ -37,14 +41,7 @@ public:
     RegularTerminator(BlockBuilder* builder)
         : Terminator(builder) {}
 
-    bool checkFinish(const Command &command) override {
-        if (++commandCount == commandSize) {
-            commandCount = 0;
-            return true;
-        }
-//        ++commandCount;
-        return false;
-    }
+    bool checkFinish(const Command &command) override;
 
     static void setCommandSize(int value) {
         commandSize = value;
@@ -59,16 +56,8 @@ public:
     DynamicTerminator(BlockBuilder* builder)
         : Terminator(builder) {}
 
-    bool checkFinish(const Command &command) override {
-        if ( command.line().compare("{") ) {
-            ++m_counter;
-            return false;
-        } else if (command.line().compare("}")) {
-            --m_counter;
-            if ( m_counter == 0 )
-                return true;
-        }
-    }
+    bool checkFinish(const Command &command) override;
+
 private:
     int m_counter = 0;
 };

@@ -11,7 +11,7 @@ FileWriter::FileWriter()
 
 void FileWriter::write(const Block &block)
 {
-    auto timeStamp = block.begin()->timeStamp();
+    auto timeStamp = static_cast<int>( block.begin()->timeStamp() );
     char fileName[50];
     std::sprintf( fileName, "bulk%i.log", timeStamp );
     std::ofstream out(fileName);

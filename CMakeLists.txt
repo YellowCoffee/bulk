@@ -4,6 +4,7 @@ project(bulk LANGUAGES CXX VERSION 0.0.1)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra")
 
 add_executable(bulk main.cpp Command.cpp Block.cpp BlockBuilder.cpp BlockWriter.cpp FileWriter.cpp ConsoleWriter.cpp)
 

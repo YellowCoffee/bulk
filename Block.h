@@ -19,4 +19,5 @@ private:
     std::list<Command> m_commandVector;
 };
 
+
 #endif // BLOCK_H

@@ -1,7 +1,7 @@
 #ifndef BLOCK_H
 #define BLOCK_H
 
-#include <vector>
+#include <list>
 #include <string>
 
 #include "Command.h"
@@ -9,14 +9,14 @@
 class Block
 {
 public:
-    Block( const std::vector<Command>& commandVector );
-    std::vector<Command>::const_iterator begin() const;
-    std::vector<Command>::const_iterator end() const;
+    Block( const std::list<Command>& commandVector );
+    std::list<Command>::const_iterator begin() const;
+    std::list<Command>::const_iterator end() const;
 
     time_t timeStamp() const;
 
 private:
-    std::vector<Command> m_commandVector;
+    std::list<Command> m_commandVector;
 };
 
 #endif // BLOCK_H

@@ -1,6 +1,8 @@
 #ifndef BLOCKBUILDER_H
 #define BLOCKBUILDER_H
 
+#include <memory>
+
 #include "Block.h"
 #include "BlockWriter.h"
 
@@ -12,18 +14,18 @@ class BlockBuilder
 {
 public:
     BlockBuilder();
-    BlockBuilder(int blockSize);
 
     void insertCommand(const Command& command);
+    void setBlockSize(int blockSize);
     Block getBlock();
-    void subscribe(BlockWriter* blockWriter);
+    void subscribe(const std::shared_ptr<BlockWriter> &blockWriter);
 
-    void setTerminator(Terminator *terminator);
+    void setTerminator(const std::shared_ptr<Terminator>& terminator);
 
 private:
-    std::vector<Command> m_commands;
-    std::vector<BlockWriter*> m_blockWriters;
-    Terminator *m_terminator;
+    std::list<Command> m_commands;
+    std::list<std::weak_ptr<BlockWriter>> m_blockWriters;
+    std::shared_ptr<Terminator> m_terminator;
 };
 
 class Terminator {

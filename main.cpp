@@ -7,8 +7,6 @@
 
 using namespace std;
 
-#include <fstream>
-
 int main(int argc, char *argv[])
 {
     BlockBuilder blockBuilder;
@@ -16,22 +14,20 @@ int main(int argc, char *argv[])
         int i;
         try {
             i = std::stoi( argv[1] );
-            blockBuilder = BlockBuilder(i);
+            blockBuilder.setBlockSize(i);
         } catch (...) {
 
         }
     }
 
-    FileWriter fileWriter;
-    blockBuilder.subscribe( &fileWriter );
+    auto fileWriter = std::make_shared<FileWriter>();
+    blockBuilder.subscribe( fileWriter );
 
-    ConsoleWriter consoleWriter;
-    blockBuilder.subscribe( &consoleWriter);
-
-    std::ifstream is("D:/Qt/build-bulk-Desktop_Qt_5_8_0_MinGW_32bit-Default/test2.txt");
+    auto consoleWriter = std::make_shared<ConsoleWriter>();
+    blockBuilder.subscribe( consoleWriter );
 
     string line;
-    while ( getline(/*std::cin*/ is, line) ) {
+    while ( getline(std::cin, line) ) {
         blockBuilder.insertCommand( line );
     }
     blockBuilder.insertCommand( Command::CommandType::Eof );

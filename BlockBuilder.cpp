@@ -1,18 +1,10 @@
 #include "BlockBuilder.h"
 
-#include <iostream>
-
 int RegularTerminator::commandSize = 3;
 
 BlockBuilder::BlockBuilder()
 {
-    m_terminator = new RegularTerminator(this);
-}
-
-BlockBuilder::BlockBuilder(int blockSize)
-    : BlockBuilder()
-{
-    RegularTerminator::setCommandSize( blockSize );
+    m_terminator = std::make_shared<RegularTerminator>(this);
 }
 
 void BlockBuilder::insertCommand(const Command &command)
@@ -26,18 +18,24 @@ void BlockBuilder::insertCommand(const Command &command)
 
         Block block( m_commands );
         for(const auto& blockWriter : m_blockWriters) {
-            blockWriter->write(block);
+            if (auto ptr = blockWriter.lock())
+                ptr->write(block);
         }
         m_commands.clear();
     }
 }
 
-void BlockBuilder::subscribe(BlockWriter *blockWriter)
+void BlockBuilder::setBlockSize(int blockSize)
 {
-    m_blockWriters.push_back( blockWriter );
+    RegularTerminator::setCommandSize( blockSize );
 }
 
-void BlockBuilder::setTerminator(Terminator *terminator)
+void BlockBuilder::subscribe(const std::shared_ptr<BlockWriter>& blockWriter)
+{
+    m_blockWriters.push_back( std::weak_ptr<BlockWriter>( blockWriter ));
+}
+
+void BlockBuilder::setTerminator(const std::shared_ptr<Terminator> &terminator)
 {
     m_terminator = terminator;
 }
@@ -46,10 +44,9 @@ bool RegularTerminator::checkFinish(const Command &command)
 {
     switch (command.commandType()) {
     case Command::CommandType::OpenBrace: {
-        auto terminator = new DynamicTerminator(m_builder);
+        auto terminator = std::make_shared<DynamicTerminator>(m_builder);
         m_builder->setTerminator( terminator );
-        terminator->checkFinish(command);
-        return true;
+        return terminator->checkFinish(command);
     }
     case Command::CommandType::Eof:
         return true;
@@ -68,12 +65,13 @@ bool DynamicTerminator::checkFinish(const Command &command)
 {
     switch (command.commandType()) {
     case Command::CommandType::OpenBrace:
-        ++m_counter;
+        if ( m_counter++ == 0)
+            return true;
         return false;
     case Command::CommandType::CloseBrace:
         --m_counter;
         if ( m_counter == 0 ) {
-            auto terminator = new RegularTerminator(m_builder);
+            auto terminator = std::make_shared<RegularTerminator>(m_builder);
             m_builder->setTerminator( terminator );
             return true;
         }
